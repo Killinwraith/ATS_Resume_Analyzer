@@ -1,0 +1,6 @@
+app: 
+    streamlit run app.py           
+
+
+Server:
+    fastapi dev main.py;  
