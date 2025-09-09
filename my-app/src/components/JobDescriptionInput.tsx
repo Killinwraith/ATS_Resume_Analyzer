@@ -11,19 +11,18 @@ import {
 import { Textarea } from "./ui/textarea";
 
 interface jobDescriptionInputProps {
-  onJobDescriptionSubmit: (description: string) => void;
-  
+  onJobDescriptionTyping: (description: string) => void;
 }
 
 const JobDescriptionInput = ({
-  onJobDescriptionSubmit,
+  onJobDescriptionTyping,
 }: jobDescriptionInputProps) => {
   const [jobDescription, setJobDescription] = useState("");
 
   const handleJobDescriptionChange = (e: string) => {
     const text = e;
     setJobDescription(text);
-    onJobDescriptionSubmit(text);
+    onJobDescriptionTyping(text);
   };
 
   const wordCount = jobDescription
