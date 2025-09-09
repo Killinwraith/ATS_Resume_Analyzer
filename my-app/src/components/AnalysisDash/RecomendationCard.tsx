@@ -5,8 +5,6 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-  CardFooter,
-  CardAction,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Recommendation } from "@/models/Recommendation";
@@ -83,9 +81,6 @@ const RecomendationCard = ({ recommendations }: RecomendationCardProps) => {
             })}
           </div>
         </CardContent>
-        <CardFooter>
-          <p>Card Footer</p>
-        </CardFooter>
       </Card>
     </>
   );

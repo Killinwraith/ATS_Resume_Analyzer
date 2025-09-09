@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { FileSearch, ArrowLeft } from "lucide-react";
 import ResumeUploader from "@/components/ResumeUploader";
 import JobDescriptionInput from "@/components/JobDescriptionInput";
-import AnalysisDashboard from "@/components/AnalysisDash/AnalysisDashboard";
 import { useRouter } from "next/navigation";
 
 const Dashboard = () => {
