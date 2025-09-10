@@ -12,10 +12,12 @@ import { Textarea } from "./ui/textarea";
 
 interface jobDescriptionInputProps {
   onJobDescriptionTyping: (description: string) => void;
+  IsAnalyszing: boolean;
 }
 
 const JobDescriptionInput = ({
   onJobDescriptionTyping,
+  IsAnalyszing,
 }: jobDescriptionInputProps) => {
   const [jobDescription, setJobDescription] = useState("");
 
@@ -47,6 +49,7 @@ const JobDescriptionInput = ({
               onChange={(e) => handleJobDescriptionChange(e.target.value)}
               value={jobDescription}
               className="min-h-[250px] max-h-[400px]"
+              disabled={IsAnalyszing}
             />
             <p className="text-sm text-muted-foreground text-left">
               {wordCount} words

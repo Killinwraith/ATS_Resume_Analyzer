@@ -13,9 +13,13 @@ import { Button } from "@/components/ui/button";
 
 interface ResumeUploaderProps {
   onFileSelect: (file: File) => void;
+  IsAnalyszing: boolean;
 }
 
-const ResumeUploader = ({ onFileSelect }: ResumeUploaderProps) => {
+const ResumeUploader = ({
+  onFileSelect,
+  IsAnalyszing,
+}: ResumeUploaderProps) => {
   const [dragActive, setDragActive] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
@@ -109,7 +113,12 @@ const ResumeUploader = ({ onFileSelect }: ResumeUploaderProps) => {
                   </p>
                 </div>
               </div>
-              <Button variant="ghost" size="sm" onClick={removeFile}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={removeFile}
+                disabled={IsAnalyszing}
+              >
                 <X className="h-4 w-4" />
               </Button>
             </div>

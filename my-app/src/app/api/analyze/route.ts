@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import PDFParser from "pdf2json";
+import fs from "fs/promises";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
@@ -60,13 +61,17 @@ export async function POST(request: NextRequest) {
     // Extract text from PDF
     const resumeText = await parsePdf(buffer);
 
-    console.log("Extracted Resume Text:", resumeText.slice(0, 300)); // preview
-    console.log("Resume: ", resume);
-    console.log("Job Description: ", jobDescription);
+    //    console.log("Extracted Resume Text:", resumeText.slice(0, 300)); // preview
+    //    console.log("Resume: ", resume);
+    //    console.log("Job Description: ", jobDescription);
+
+    let prompt = await fs.readFile("/Users/hetangmehta/Desktop/Hetang Mehta/ATS_Resume_Analyzer/ATS_Resume_Analyzer/my-app/src/app/api/analyze/prompt.txt", "utf8");
+
+    prompt = `${prompt} \n Resume: ${resumeText}; Job Description: ${jobDescription}`;
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
-      contents: `extract the skills from the resume and the job description: Resume: ${resumeText}; Job Description: ${jobDescription}`,
+      contents: prompt,
     });
 
     console.log("Analysis: ", response);

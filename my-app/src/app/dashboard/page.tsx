@@ -83,10 +83,11 @@ const Dashboard = () => {
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <ResumeUploader onFileSelect={handleFileSelect} />
+          <ResumeUploader onFileSelect={handleFileSelect} IsAnalyszing={isAnalyzing}/>
 
           <JobDescriptionInput
             onJobDescriptionTyping={handleJobDescriptionTyping}
+            IsAnalyszing={isAnalyzing}
           />
         </div>
 
