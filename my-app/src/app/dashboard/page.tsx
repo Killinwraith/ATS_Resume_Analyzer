@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { FileSearch, ArrowLeft } from "lucide-react";
@@ -83,7 +83,10 @@ const Dashboard = () => {
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <ResumeUploader onFileSelect={handleFileSelect} IsAnalyszing={isAnalyzing}/>
+          <ResumeUploader
+            onFileSelect={handleFileSelect}
+            IsAnalyszing={isAnalyzing}
+          />
 
           <JobDescriptionInput
             onJobDescriptionTyping={handleJobDescriptionTyping}

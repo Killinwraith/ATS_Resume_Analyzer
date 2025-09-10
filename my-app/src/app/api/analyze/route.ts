@@ -54,18 +54,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Convert File -> Buffer
     const arrayBuffer = await resume.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-
-    // Extract text from PDF
     const resumeText = await parsePdf(buffer);
 
-    //    console.log("Extracted Resume Text:", resumeText.slice(0, 300)); // preview
-    //    console.log("Resume: ", resume);
-    //    console.log("Job Description: ", jobDescription);
-
-    let prompt = await fs.readFile("/Users/hetangmehta/Desktop/Hetang Mehta/ATS_Resume_Analyzer/ATS_Resume_Analyzer/my-app/src/app/api/analyze/prompt.txt", "utf8");
+    let prompt = await fs.readFile("./src/app/api/analyze/prompt.txt", "utf8");
 
     prompt = `${prompt} \n Resume: ${resumeText}; Job Description: ${jobDescription}`;
 
@@ -74,13 +67,14 @@ export async function POST(request: NextRequest) {
       contents: prompt,
     });
 
-    console.log("Analysis: ", response);
-
     return NextResponse.json({
       analysis: response.text,
       success: true,
     });
   } catch (error) {
+
+
+    
     console.error("Error in resume analysis:", error);
     return NextResponse.json(
       { error: "Failed to analyze resume" },
