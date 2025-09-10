@@ -39,6 +39,20 @@ const ResumeUploader = ({ onFileSelect }: ResumeUploaderProps) => {
     setUploadedFile(null);
   };
 
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
+        setUploadedFile(file);
+        onFileSelect(file);
+      }
+    }
+  };
+
   return (
     <>
       <Card className="w-full max-w-2xl mx-auto">
@@ -58,6 +72,10 @@ const ResumeUploader = ({ onFileSelect }: ResumeUploaderProps) => {
                   ? "border-primary bg-primary/5"
                   : "border-muted-foreground/25 hover:border-primary/50"
               }`}
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
             >
               <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
               <p className="mb-2">Drag and drop your resume here, or</p>

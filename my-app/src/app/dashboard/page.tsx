@@ -43,21 +43,25 @@ const Dashboard = () => {
 
     let analysis: string | null = null;
     if (resume && jobDescription) {
+      setProgress(25);
       try {
         const response = await fetch("/api/analyze", {
           method: "POST",
           body: formData,
         });
-
+        setProgress(50);
         if (response.ok) {
+          setProgress(75);
           const data = await response.json();
           analysis = data.analysis;
           console.log("Analysis successful:", analysis);
         } else {
+          setProgress(75);
           const errorData = await response.json();
           console.error("Analysis failed:", errorData.error);
         }
       } catch (error) {
+        setProgress(75);
         console.error("Error calling analysis API:", error);
       }
     }
