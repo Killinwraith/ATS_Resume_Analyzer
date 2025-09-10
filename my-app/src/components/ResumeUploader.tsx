@@ -67,14 +67,14 @@ const ResumeUploader = ({ onFileSelect }: ResumeUploaderProps) => {
                   <input
                     id="file-upload"
                     type="file"
-                    accept=".pdf,.docx,.doc"
+                    accept=".pdf"
                     hidden
                     onChange={handleFileInput}
                   />
                 </label>
               </Button>
               <p className="mt-2 text-sm text-muted-foreground">
-                Supported format: PDF, DOCX, DOC (max 10MB)
+                Supported format: PDF (max 10MB)
               </p>
             </div>
           ) : (
