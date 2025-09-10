@@ -1,3 +1,5 @@
 streamlit
 "fastapi[standard]"
 requests
+
+npm install @google/genai

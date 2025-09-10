@@ -46,7 +46,7 @@ const JobDescriptionInput = ({
               placeholder="Paste the job description to analyze resume compatibility"
               onChange={(e) => handleJobDescriptionChange(e.target.value)}
               value={jobDescription}
-              className="min-h-[250px]"
+              className="min-h-[250px] max-h-[400px]"
             />
             <p className="text-sm text-muted-foreground text-left">
               {wordCount} words
