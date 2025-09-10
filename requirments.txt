@@ -1,6 +1,0 @@
-streamlit
-"fastapi[standard]"
-requests
-
-npm install @google/genai
-npm install pdf-parse
