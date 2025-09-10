@@ -37,18 +37,16 @@ const Dashboard = () => {
     setIsAnalyzing(true);
     setProgress(0);
 
+    const formData = new FormData();
+    formData.append("resume", resume as File);
+    formData.append("jobDescription", jobDescription);
+
     let analysis: string | null = null;
-    if (resume) {
+    if (resume && jobDescription) {
       try {
         const response = await fetch("/api/analyze", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            resume: await resume.text(),
-            jobDescription: jobDescription,
-          }),
+          body: formData,
         });
 
         if (response.ok) {
@@ -94,12 +92,7 @@ const Dashboard = () => {
           </div>
         ) : (
           <div className="text-center">
-            <Button
-              onClick={startAnalysis}
-              size="lg"
-              className="px-8"
-              disabled={resume == null || jobDescription.trim() == ""}
-            >
+            <Button onClick={startAnalysis} size="lg" className="px-8">
               <FileSearch className="h-5 w-5 mr-2" />
               Start Analysis
             </Button>

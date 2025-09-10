@@ -10,7 +10,14 @@ const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
 export async function POST(request: NextRequest) {
   try {
-    const { resume, jobDescription } = await request.json();
+    console.log("Request: ", request);
+    const formData = await request.formData();
+
+    console.log("Form Data: ", formData);
+    const resume = formData.get("resume");
+    const jobDescription = formData.get("jobDescription");
+
+    console.log("Resume: ", resume);
 
     if (!resume || !jobDescription) {
       return NextResponse.json(
@@ -26,9 +33,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const resumeAnalysis = await analyzeResume(resume);
-
-    console.log("Resume Analysis: ", resumeAnalysis);
+    console.log("Resume: ", resume);
+    console.log("Job Description: ", jobDescription);
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -48,11 +54,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-async function analyzeResume(resume: string) {
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: `extract the skills from the resume: ${resume}`,
-  });
 }
