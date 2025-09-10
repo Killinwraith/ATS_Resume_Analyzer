@@ -30,8 +30,10 @@ const Dashboard = () => {
   };
 
   const startAnalysis = async () => {
+    if (!resume && !jobDescription.trim()) {
+      return;
+    }
     console.log("Start Analysis");
-    console.log(await resume?.text());
     setIsAnalyzing(true);
     setProgress(0);
 
@@ -92,7 +94,12 @@ const Dashboard = () => {
           </div>
         ) : (
           <div className="text-center">
-            <Button onClick={startAnalysis} size="lg" className="px-8">
+            <Button
+              onClick={startAnalysis}
+              size="lg"
+              className="px-8"
+              disabled={resume == null || jobDescription.trim() == ""}
+            >
               <FileSearch className="h-5 w-5 mr-2" />
               Start Analysis
             </Button>

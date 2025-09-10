@@ -3,3 +3,4 @@ streamlit
 requests
 
 npm install @google/genai
+npm install pdf-parse
