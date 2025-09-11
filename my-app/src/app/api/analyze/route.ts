@@ -3,6 +3,14 @@ import { GoogleGenAI } from "@google/genai";
 import PDFParser from "pdf2json";
 import fs from "fs/promises";
 
+interface ApiError {
+  error?: {
+    code?: number;
+    status?: string;
+  };
+  message?: string;
+}
+
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
@@ -10,17 +18,22 @@ function parsePdf(fileBuffer: Buffer): Promise<string> {
   return new Promise((resolve, reject) => {
     const pdfParser = new PDFParser();
 
-    pdfParser.on("pdfParser_dataError", (errData: any) => {
+    pdfParser.on("pdfParser_dataError", (errData: { parserError: Error }) => {
       reject(errData.parserError);
     });
 
-    pdfParser.on("pdfParser_dataReady", (pdfData: any) => {
-      const pages = pdfData.Pages.map((page: any) =>
-        page.Texts.map((t: any) => decodeURIComponent(t.R[0].T)).join(" ")
-      ).join("\n\n");
+    pdfParser.on(
+      "pdfParser_dataReady",
+      (pdfData: {
+        Pages: Array<{ Texts: Array<{ R: Array<{ T: string }> }> }>;
+      }) => {
+        const pages = pdfData.Pages.map((page) =>
+          page.Texts.map((t) => decodeURIComponent(t.R[0].T)).join(" ")
+        ).join("\n\n");
 
-      resolve(cleanPdfText(pages));
-    });
+        resolve(cleanPdfText(pages));
+      }
+    );
 
     pdfParser.parseBuffer(fileBuffer);
   });
@@ -71,11 +84,14 @@ export async function POST(request: NextRequest) {
       analysis: response.text,
       success: true,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in resume analysis:", error);
 
     // Handle Google Gemini API overload error (503)
-    if (error?.error?.code === 503 || error?.error?.status === "UNAVAILABLE") {
+    if (
+      (error as ApiError)?.error?.code === 503 ||
+      (error as ApiError)?.error?.status === "UNAVAILABLE"
+    ) {
       return NextResponse.json(
         {
           error:
@@ -88,7 +104,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle other API errors
-    if (error?.error?.code) {
+    if ((error as ApiError)?.error?.code) {
       return NextResponse.json(
         {
           error: "AI service temporarily unavailable. Please try again later.",
@@ -100,7 +116,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle PDF parsing errors
-    if (error?.message?.includes("pdf") || error?.message?.includes("PDF")) {
+    if (
+      (error as ApiError)?.message?.includes("pdf") ||
+      (error as ApiError)?.message?.includes("PDF")
+    ) {
       return NextResponse.json(
         {
           error:

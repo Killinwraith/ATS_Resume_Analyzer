@@ -4,8 +4,6 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-  CardFooter,
-  CardAction,
   CardDescription,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,18 +16,6 @@ interface SkillsCardProps {
   additionalSkills: string[];
 }
 
-const getSkillStatusColor = (status: SkillStatus) => {
-  switch (status) {
-    case SkillStatus.FOUND:
-      return "text-green-600";
-    case SkillStatus.PARTIALLY_FOUND:
-      return "text-yellow-600";
-    case SkillStatus.MISSING:
-      return "text-red-600";
-    default:
-      return "text-gray-600";
-  }
-};
 const getSkillImportanceBadge = (importance: SkillImportance) => {
   switch (importance) {
     case SkillImportance.HIGH:

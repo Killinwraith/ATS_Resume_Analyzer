@@ -1,8 +1,8 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { FileSearch, ArrowLeft } from "lucide-react";
+import { FileSearch } from "lucide-react";
 import ResumeUploader from "@/components/ResumeUploader";
 import JobDescriptionInput from "@/components/JobDescriptionInput";
 import { useRouter } from "next/navigation";
@@ -45,7 +45,6 @@ const Dashboard = () => {
     formData.append("resume", resume as File);
     formData.append("jobDescription", jobDescription);
 
-    let analysis: string | null = null;
     if (resume && jobDescription) {
       setProgress(25);
       try {
@@ -56,8 +55,7 @@ const Dashboard = () => {
         setProgress(50);
         if (response.ok) {
           setProgress(75);
-          const data = await response.json();
-          analysis = data.analysis;
+          await response.json();
           router.push("/analysisDashboard");
         } else {
           setProgress(75);

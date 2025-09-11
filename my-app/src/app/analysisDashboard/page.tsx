@@ -16,10 +16,8 @@ import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardDescription,
-  CardAction,
   CardHeader,
   CardContent,
-  CardFooter,
   CardTitle,
 } from "@/components/ui/card";
 import { FileText, User, Calendar, MapPin, ArrowLeft } from "lucide-react";
