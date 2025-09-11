@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import PDFParser from "pdf2json";
 import fs from "fs/promises";
+import { Analysis } from "@/models/Analysis";
+import { CandidateInfo } from "@/models/CandidateInfo";
+import { RequiredSkill } from "@/models/RequiredSkill";
+import {
+  RecommendationImpact,
+  RecommendationType,
+  SkillImportance,
+  SkillStatus,
+} from "@/models/Constants";
+import { Recommendation } from "@/models/Recommendation";
+import { Score } from "@/models/Score";
 
 interface ApiError {
   error?: {
@@ -47,6 +58,125 @@ function cleanPdfText(text: string): string {
     .trim();
 }
 
+function convertJsonToAnalysis(
+  resume: File,
+  json: string | undefined
+): Analysis {
+  if (!json) {
+    return new Analysis(
+      "No analysis",
+      new CandidateInfo("", "", "", "", "", ""),
+      [],
+      [],
+      new Score(0, 0, 0, 0, 0),
+      []
+    );
+  }
+
+  json = json.replace("```json", "").replace("```", "");
+
+  //console.log("Json: ", json);
+
+  let jsonObject = JSON.parse(json);
+
+  let fileName = resume.name;
+
+  let candidateInfo = new CandidateInfo(
+    jsonObject.CandidateName,
+    jsonObject.CandidateEmail,
+    jsonObject.CandidatePhone,
+    jsonObject.CurrentLocation,
+    `${jsonObject.TotalYearsExperience} years`,
+    jsonObject.CurrentPosition
+  );
+
+  let requiredSkills: RequiredSkill[] = [];
+
+  for (let item of jsonObject.JDListedSkills) {
+    let name = item.Name;
+    let type = item.Type;
+    let _priority = item.Priority;
+
+    let status = item.FoundInResume ? SkillStatus.FOUND : SkillStatus.MISSING;
+    let priority = SkillImportance.LOW;
+    switch (_priority) {
+      case "High":
+        priority = SkillImportance.HIGH;
+        break;
+      case "Medium":
+        priority = SkillImportance.MEDIUM;
+        break;
+      case "Low":
+        priority = SkillImportance.LOW;
+        break;
+      default:
+        priority = SkillImportance.LOW;
+        break;
+    }
+    requiredSkills.push(new RequiredSkill(name, status, priority));
+  }
+
+  let recommendations: Recommendation[] = [];
+
+  for (let item of jsonObject.Recommendations) {
+    let type = item.type;
+    let title = item.title;
+    let description = item.description;
+    let impact = item.impact;
+
+    let Type = RecommendationType.CRITICAL;
+    switch (type) {
+      case "Critical":
+        Type = RecommendationType.CRITICAL;
+        break;
+      case "Improvement":
+        Type = RecommendationType.IMPROVEMENT;
+        break;
+    }
+    let Impact = RecommendationImpact.HIGH;
+    switch (impact) {
+      case "High":
+        Impact = RecommendationImpact.HIGH;
+        break;
+      case "Medium":
+        Impact = RecommendationImpact.MEDIUM;
+        break;
+      case "Low":
+        Impact = RecommendationImpact.LOW;
+        break;
+    }
+
+    let recommendation = new Recommendation(Type, title, description, Impact);
+    recommendations.push(recommendation);
+  }
+
+  let overallScore = jsonObject.OverallScore;
+  let skillsMatch = jsonObject.CategoryScores.SkillsMatch;
+  let experienceMatch = jsonObject.CategoryScores.ExperienceMatch;
+  let educationMatch = jsonObject.CategoryScores.EducationMatch;
+  let keywordsMatch = jsonObject.CategoryScores.KeywordsMatch;
+
+  let score = new Score(
+    overallScore,
+    skillsMatch,
+    experienceMatch,
+    educationMatch,
+    keywordsMatch
+  );
+
+  let additionalResumeSkills: string[] = jsonObject.AdditionalResumeSkills;
+
+  let analysis = new Analysis(
+    fileName,
+    candidateInfo,
+    requiredSkills,
+    recommendations,
+    score,
+    additionalResumeSkills
+  );
+  return analysis;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -79,9 +209,13 @@ export async function POST(request: NextRequest) {
       model: "gemini-2.5-flash",
       contents: prompt,
     });
+    //console.log("Response: ", response.text);
+    //console.log("Response: ", response);
+
+    let analysis: Analysis = convertJsonToAnalysis(resume, response.text);
 
     return NextResponse.json({
-      analysis: response.text,
+      analysis,
       success: true,
     });
   } catch (error: unknown) {

@@ -55,7 +55,11 @@ const Dashboard = () => {
         setProgress(50);
         if (response.ok) {
           setProgress(75);
-          await response.json();
+
+          let analysis = await response.text();
+          let analysisJson = JSON.parse(analysis);
+          //console.log("analysisJson.analysis: ", analysisJson.analysis);
+
           router.push("/analysisDashboard");
         } else {
           setProgress(75);

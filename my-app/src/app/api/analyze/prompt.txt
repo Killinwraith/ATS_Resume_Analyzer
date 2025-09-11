@@ -45,6 +45,12 @@ Your tasks are as follows (follow step-by-step, do not skip any section):
 
 ⸻
 
+
+IMPORTANT:
+- Output **strict, valid JSON only**.
+- Do **not include line breaks or \n** in the JSON.
+- Do **not use markdown formatting** (no ```json```).
+
 Final Output Format (STRICT JSON ONLY):
 {
   "OverallScore": number,   // 0-100 weighted score
@@ -80,5 +86,8 @@ Final Output Format (STRICT JSON ONLY):
   ],
   "CurrentPosition": string,
   "TotalYearsExperience": number,
-  "CurrentLocation": string
+  "CurrentLocation": string,
+  "CandidateName": string,
+  "CandidateEmail": string,
+
 }
