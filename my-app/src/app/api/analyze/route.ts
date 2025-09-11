@@ -77,11 +77,11 @@ function convertJsonToAnalysis(
 
   //console.log("Json: ", json);
 
-  let jsonObject = JSON.parse(json);
+  const jsonObject = JSON.parse(json);
 
-  let fileName = resume.name;
+  const fileName = resume.name;
 
-  let candidateInfo = new CandidateInfo(
+  const candidateInfo = new CandidateInfo(
     jsonObject.CandidateName,
     jsonObject.CandidateEmail,
     jsonObject.CandidatePhone,
@@ -90,14 +90,13 @@ function convertJsonToAnalysis(
     jsonObject.CurrentPosition
   );
 
-  let requiredSkills: RequiredSkill[] = [];
+  const requiredSkills: RequiredSkill[] = [];
 
-  for (let item of jsonObject.JDListedSkills) {
-    let name = item.Name;
-    let type = item.Type;
-    let _priority = item.Priority;
+  for (const item of jsonObject.JDListedSkills) {
+    const name = item.Name;
+    const _priority = item.Priority;
 
-    let status = item.FoundInResume ? SkillStatus.FOUND : SkillStatus.MISSING;
+    const status = item.FoundInResume ? SkillStatus.FOUND : SkillStatus.MISSING;
     let priority = SkillImportance.LOW;
     switch (_priority) {
       case "High":
@@ -116,13 +115,13 @@ function convertJsonToAnalysis(
     requiredSkills.push(new RequiredSkill(name, status, priority));
   }
 
-  let recommendations: Recommendation[] = [];
+  const recommendations: Recommendation[] = [];
 
-  for (let item of jsonObject.Recommendations) {
-    let type = item.type;
-    let title = item.title;
-    let description = item.description;
-    let impact = item.impact;
+  for (const item of jsonObject.Recommendations) {
+    const title = item.title;
+    const description = item.description;
+    const impact = item.impact;
+    const type = item.type;
 
     let Type = RecommendationType.CRITICAL;
     switch (type) {
@@ -146,17 +145,17 @@ function convertJsonToAnalysis(
         break;
     }
 
-    let recommendation = new Recommendation(Type, title, description, Impact);
+    const recommendation = new Recommendation(Type, title, description, Impact);
     recommendations.push(recommendation);
   }
 
-  let overallScore = jsonObject.OverallScore;
-  let skillsMatch = jsonObject.CategoryScores.SkillsMatch;
-  let experienceMatch = jsonObject.CategoryScores.ExperienceMatch;
-  let educationMatch = jsonObject.CategoryScores.EducationMatch;
-  let keywordsMatch = jsonObject.CategoryScores.KeywordsMatch;
+  const overallScore = jsonObject.OverallScore;
+  const skillsMatch = jsonObject.CategoryScores.SkillsMatch;
+  const experienceMatch = jsonObject.CategoryScores.ExperienceMatch;
+  const educationMatch = jsonObject.CategoryScores.EducationMatch;
+  const keywordsMatch = jsonObject.CategoryScores.KeywordsMatch;
 
-  let score = new Score(
+  const score = new Score(
     overallScore,
     skillsMatch,
     experienceMatch,
@@ -164,9 +163,9 @@ function convertJsonToAnalysis(
     keywordsMatch
   );
 
-  let additionalResumeSkills: string[] = jsonObject.AdditionalResumeSkills;
+  const additionalResumeSkills: string[] = jsonObject.AdditionalResumeSkills;
 
-  let analysis = new Analysis(
+  const analysis = new Analysis(
     fileName,
     candidateInfo,
     requiredSkills,
@@ -212,7 +211,7 @@ export async function POST(request: NextRequest) {
     //console.log("Response: ", response.text);
     //console.log("Response: ", response);
 
-    let analysis: Analysis = convertJsonToAnalysis(resume, response.text);
+    const analysis: Analysis = convertJsonToAnalysis(resume, response.text);
 
     return NextResponse.json({
       analysis,
