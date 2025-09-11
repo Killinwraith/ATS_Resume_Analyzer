@@ -6,6 +6,7 @@ import { FileSearch } from "lucide-react";
 import ResumeUploader from "@/components/ResumeUploader";
 import JobDescriptionInput from "@/components/JobDescriptionInput";
 import { useRouter } from "next/navigation";
+import { useAnalysis } from "@/contexts/AnalysisContext";
 
 const Dashboard = () => {
   const [canAnalyze, setCanAnalyze] = useState(false);
@@ -18,6 +19,7 @@ const Dashboard = () => {
   const [showRetryButton, setShowRetryButton] = useState(false);
 
   const router = useRouter();
+  const { setAnalysis, setIsLoading, setError } = useAnalysis();
 
   const handleFileSelect = (file: File) => {
     //console.log(file);
@@ -37,8 +39,10 @@ const Dashboard = () => {
     }
     console.log("Start Analysis");
     setIsAnalyzing(true);
+    setIsLoading(true);
     setProgress(0);
     setErrorMessage("");
+    setError(null);
     setShowRetryButton(false);
 
     const formData = new FormData();
@@ -56,9 +60,12 @@ const Dashboard = () => {
         if (response.ok) {
           setProgress(75);
 
-          await response.text();
-          //console.log("analysisJson.analysis: ", analysisJson.analysis);
+          const analysisJson = await response.json();
+          console.log("analysisJson.analysis: ", analysisJson.analysis);
 
+          // Store analysis in context and navigate
+          setAnalysis(analysisJson.analysis);
+          setIsLoading(false);
           router.push("/analysisDashboard");
         } else {
           setProgress(75);
@@ -75,6 +82,8 @@ const Dashboard = () => {
             );
             setShowRetryButton(false);
           }
+          setError(errorData.error || "Analysis failed. Please try again.");
+          setIsLoading(false);
         }
       } catch (error) {
         setProgress(75);
@@ -82,7 +91,9 @@ const Dashboard = () => {
         setErrorMessage(
           "Network error. Please check your connection and try again."
         );
+        setError("Network error. Please check your connection and try again.");
         setShowRetryButton(true);
+        setIsLoading(false);
       }
     }
     setIsAnalyzing(false);

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { FileSearch } from "lucide-react";
+import { AnalysisProvider } from "@/contexts/AnalysisContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,7 +46,9 @@ export default function RootLayout({
           </div>
         </header>
 
-        <main className="container mx-auto px-4 py-8 flex-1">{children}</main>
+        <main className="container mx-auto px-4 py-8 flex-1">
+          <AnalysisProvider>{children}</AnalysisProvider>
+        </main>
 
         <footer className="border-t bg-card mt-auto">
           <div className="container mx-auto px-4 py-6">
