@@ -71,13 +71,48 @@ export async function POST(request: NextRequest) {
       analysis: response.text,
       success: true,
     });
-  } catch (error) {
-
-
-    
+  } catch (error: any) {
     console.error("Error in resume analysis:", error);
+
+    // Handle Google Gemini API overload error (503)
+    if (error?.error?.code === 503 || error?.error?.status === "UNAVAILABLE") {
+      return NextResponse.json(
+        {
+          error:
+            "The AI service is currently overloaded. Please try again in a few moments.",
+          code: "SERVICE_OVERLOADED",
+          retryable: true,
+        },
+        { status: 503 }
+      );
+    }
+
+    // Handle other API errors
+    if (error?.error?.code) {
+      return NextResponse.json(
+        {
+          error: "AI service temporarily unavailable. Please try again later.",
+          code: "AI_SERVICE_ERROR",
+          retryable: true,
+        },
+        { status: 503 }
+      );
+    }
+
+    // Handle PDF parsing errors
+    if (error?.message?.includes("pdf") || error?.message?.includes("PDF")) {
+      return NextResponse.json(
+        {
+          error:
+            "Failed to process PDF file. Please ensure it's a valid PDF document.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Generic error fallback
     return NextResponse.json(
-      { error: "Failed to analyze resume" },
+      { error: "Failed to analyze resume. Please try again." },
       { status: 500 }
     );
   }

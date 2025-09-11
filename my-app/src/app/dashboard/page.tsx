@@ -14,6 +14,8 @@ const Dashboard = () => {
 
   const [progress, setProgress] = useState(0);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [showRetryButton, setShowRetryButton] = useState(false);
 
   const router = useRouter();
 
@@ -36,6 +38,8 @@ const Dashboard = () => {
     console.log("Start Analysis");
     setIsAnalyzing(true);
     setProgress(0);
+    setErrorMessage("");
+    setShowRetryButton(false);
 
     const formData = new FormData();
     formData.append("resume", resume as File);
@@ -54,22 +58,34 @@ const Dashboard = () => {
           setProgress(75);
           const data = await response.json();
           analysis = data.analysis;
-          console.log("Analysis successful:", analysis);
+          router.push("/analysisDashboard");
         } else {
           setProgress(75);
           const errorData = await response.json();
           console.error("Analysis failed:", errorData.error);
+
+          // Handle specific error types
+          if (errorData.retryable) {
+            setErrorMessage(errorData.error);
+            setShowRetryButton(true);
+          } else {
+            setErrorMessage(
+              errorData.error || "Analysis failed. Please try again."
+            );
+            setShowRetryButton(false);
+          }
         }
       } catch (error) {
         setProgress(75);
         console.error("Error calling analysis API:", error);
+        setErrorMessage(
+          "Network error. Please check your connection and try again."
+        );
+        setShowRetryButton(true);
       }
     }
     setIsAnalyzing(false);
     setProgress(100);
-    console.log(analysis);
-
-    router.push("/analysisDashboard");
   };
 
   return (
@@ -97,12 +113,30 @@ const Dashboard = () => {
         {isAnalyzing ? (
           <div className="text-center">
             <Progress value={progress} />
+            <p className="text-sm text-muted-foreground mt-2">
+              Analyzing your resume... This may take a few moments.
+            </p>
           </div>
         ) : (
-          <div className="text-center">
-            <Button onClick={startAnalysis} size="lg" className="px-8">
+          <div className="text-center space-y-4">
+            {errorMessage && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-md mx-auto">
+                <p className="text-red-800 text-sm">{errorMessage}</p>
+                {showRetryButton && (
+                  <p className="text-red-600 text-xs mt-1">
+                    This is usually temporary. Please try again.
+                  </p>
+                )}
+              </div>
+            )}
+            <Button
+              onClick={startAnalysis}
+              size="lg"
+              className="px-8"
+              disabled={!canAnalyze}
+            >
               <FileSearch className="h-5 w-5 mr-2" />
-              Start Analysis
+              {showRetryButton ? "Try Again" : "Start Analysis"}
             </Button>
           </div>
         )}
