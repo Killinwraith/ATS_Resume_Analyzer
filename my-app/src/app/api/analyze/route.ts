@@ -5,6 +5,7 @@ import fs from "fs/promises";
 import { Analysis } from "@/models/Analysis";
 import { CandidateInfo } from "@/models/CandidateInfo";
 import { RequiredSkill } from "@/models/RequiredSkill";
+import path from "path";
 import {
   RecommendationImpact,
   RecommendationType,
@@ -24,6 +25,15 @@ interface ApiError {
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+
+const promptPath = path.join(
+  process.cwd(),
+  "src",
+  "app",
+  "api",
+  "analyze",
+  "prompt.txt"
+);
 
 function parsePdf(fileBuffer: Buffer): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -200,7 +210,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
     const resumeText = await parsePdf(buffer);
 
-    let prompt = await fs.readFile("./src/app/api/analyze/prompt.txt", "utf8");
+    let prompt = await fs.readFile(promptPath, "utf8");
 
     prompt = `${prompt} \n Resume: ${resumeText}; Job Description: ${jobDescription}`;
 
